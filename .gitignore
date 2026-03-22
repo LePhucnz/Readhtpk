@@ -1,0 +1,15 @@
+﻿# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.log
+
+# Visual Studio cache
+.vs/
+
+# Backup & temp files
+*.bak
+*.tmp
