@@ -7,9 +7,13 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Readhtpk.Data;
 using Readhtpk.Models;
+using Readhtpk.Models.Import;
+using Readhtpk.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Readhtpk.Controllers
 {
+    [Authorize(Roles = "Admin,Teacher")]
     public class AdminQuestionsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -156,6 +160,69 @@ namespace Readhtpk.Controllers
         private bool QuestionExists(int id)
         {
             return _context.Questions.Any(e => e.Id == id);
+        }
+
+        // GET: AdminQuestions/Import
+        public IActionResult Import()
+        {
+            ViewBag.SubjectId = new SelectList(
+                _context.Subjects.Where(s => s.IsActive).OrderBy(s => s.Name),
+                "Id", "Name");
+            return View();
+        }
+        // POST: AdminQuestions/Import
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Import(QuestionImportViewModel model)
+        {
+            ViewBag.SubjectId = new SelectList(
+                _context.Subjects.Where(s => s.IsActive).OrderBy(s => s.Name),
+                "Id", "Name", model.SubjectId);
+
+            if (model.File == null || model.File.Length == 0)
+            {
+                ModelState.AddModelError("File", "Vui lòng chọn file Excel để import");
+                return View(model);
+            }
+
+            // Kiểm tra định dạng file
+            var extension = Path.GetExtension(model.File.FileName).ToLower();
+            if (extension != ".xlsx")
+            {
+                ModelState.AddModelError("File", "Chỉ hỗ trợ file Excel định dạng .xlsx");
+                return View(model);
+            }
+
+            try
+            {
+                // Đọc và xử lý file Excel
+                using (var stream = model.File.OpenReadStream())
+                {
+                    var (questions, results) = await ExcelImportHelper.ImportQuestionsAsync(stream, model.SubjectId);
+
+                    // Lưu các câu hỏi hợp lệ vào Database
+                    if (questions.Any())
+                    {
+                        await _context.Questions.AddRangeAsync(questions);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    // Chuẩn bị dữ liệu báo cáo
+                    model.Results = results;
+                    model.TotalRows = results.Count;
+                    model.SuccessCount = results.Count(r => r.IsSuccess);
+                    model.FailedCount = results.Count(r => !r.IsSuccess);
+
+                    TempData["SuccessMessage"] = $"Import thành công {model.SuccessCount}/{model.TotalRows} câu hỏi!";
+
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Lỗi khi xử lý file: {ex.Message}");
+                return View(model);
+            }
         }
     }
 }

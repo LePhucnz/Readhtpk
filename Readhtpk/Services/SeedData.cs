@@ -29,7 +29,7 @@ namespace Readhtpk.Services
                     if (!await roleManager.RoleExistsAsync(roleName).ConfigureAwait(false))
                     {
                         await roleManager.CreateAsync(new IdentityRole(roleName)).ConfigureAwait(false);
-                        Console.WriteLine($"✅ Created role: {roleName}");
+                        Console.WriteLine($"Created role: {roleName}");
                     }
                 }
             }
@@ -61,7 +61,7 @@ namespace Readhtpk.Services
                     if (result.Succeeded)
                     {
                         await userManager.AddToRoleAsync(adminUser, "Admin").ConfigureAwait(false);
-                        Console.WriteLine("✅ Created admin user: admin@exam.com");
+                        Console.WriteLine("Created admin user: admin@exam.com");
                     }
                 }
             }
@@ -91,7 +91,7 @@ namespace Readhtpk.Services
 
                         await context.Subjects.AddRangeAsync(subjects).ConfigureAwait(false);
                         await context.SaveChangesAsync().ConfigureAwait(false);
-                        Console.WriteLine("✅ Seeded 5 default subjects");
+                        Console.WriteLine("Seeded 5 default subjects");
                     }
                 }
             }
