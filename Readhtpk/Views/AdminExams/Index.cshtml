@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Readhtpk.Models.Exam>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="bi bi-file-earmark-text"></i> Danh sách Đề thi</h2>
+        <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Tạo mới</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tên đề</th>
+                        <th>Môn học</th>
+                        <th>Thời lượng (phút)</th>
+                        <th>Số câu</th>
+                        <th>Tổng điểm</th>
+                        <th>Ngày thi</th>
+                        <th style="width: 150px;">Chức năng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Subject!.Name)</td>
+                            <td>@Html.DisplayFor(modelItem => item.DurationMinutes)</td>
+                            <td>@Html.DisplayFor(modelItem => item.TotalQuestions)</td>
+                            <td>@Html.DisplayFor(modelItem => item.TotalMarks)</td>
+                            <td>@item.ExamDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Sửa</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Chi tiết</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Xóa</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

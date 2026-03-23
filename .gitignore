@@ -1,15 +1,37 @@
 ﻿# Build results
-bin/
-obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
 
 # User-specific files
-*.user
+*.rsuser
 *.suo
-*.log
+*.user
+*.user.local
 
-# Visual Studio cache
-.vs/
+# Do not publish appsettings.json nếu có chứa Connection String thật
+# Tuy nhiên với project học tập, bạn có thể đẩy file mẫu
+appsettings.json
 
-# Backup & temp files
-*.bak
-*.tmp
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Mac
+.DS_Store

@@ -1,0 +1,78 @@
+﻿@model Readhtpk.Models.Exam
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Thêm Đề thi</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Tên đề thi</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="SubjectId" class="form-label">Môn học</label>
+                            <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.SubjectId">
+                                <option value="">-- Chọn Môn học --</option>
+                            </select>
+                            <span asp-validation-for="SubjectId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Mô tả</label>
+                            <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="DurationMinutes" class="form-label">Thời lượng (phút)</label>
+                                <input asp-for="DurationMinutes" class="form-control" type="number" />
+                                <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="TotalQuestions" class="form-label">Số câu hỏi</label>
+                                <input asp-for="TotalQuestions" class="form-control" type="number" />
+                                <span asp-validation-for="TotalQuestions" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="TotalMarks" class="form-label">Tổng điểm</label>
+                                <input asp-for="TotalMarks" class="form-control" type="number" step="0.5" />
+                                <span asp-validation-for="TotalMarks" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ExamDate" class="form-label">Ngày thi</label>
+                            <input asp-for="ExamDate" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="ExamDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CreatedBy" class="form-label">Người tạo</label>
+                            <input asp-for="CreatedBy" class="form-control" />
+                            <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input asp-for="IsActive" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label">Hoạt động</label>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary me-md-2">Quay lại</a>
+                            <button type="submit" class="btn btn-success">Lưu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

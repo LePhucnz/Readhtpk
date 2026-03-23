@@ -1,0 +1,56 @@
+﻿@model Readhtpk.Models.Exam
+
+@{
+    ViewData["Title"] = "Chi tiết Đề thi";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">Thông tin Đề thi</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Tên đề thi</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.Title)</dd>
+
+                <dt class="col-sm-3">Môn học</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.Subject.Name)</dd>
+
+                <dt class="col-sm-3">Mô tả</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.Description)</dd>
+
+                <dt class="col-sm-3">Thời lượng (phút)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.DurationMinutes)</dd>
+
+                <dt class="col-sm-3">Số câu hỏi</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.TotalQuestions)</dd>
+
+                <dt class="col-sm-3">Tổng điểm</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.TotalMarks)</dd>
+
+                <dt class="col-sm-3">Ngày thi</dt>
+                <dd class="col-sm-9">@Model.ExamDate.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                <dt class="col-sm-3">Người tạo</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.CreatedBy)</dd>
+
+                <dt class="col-sm-3">Trạng thái</dt>
+                <dd class="col-sm-9">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Hoạt động</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Ngừng</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer text-muted">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Sửa</a>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </div>
+</div>

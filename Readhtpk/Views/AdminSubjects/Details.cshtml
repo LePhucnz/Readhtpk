@@ -1,0 +1,26 @@
+﻿@model Readhtpk.Models.Subject
+
+@{
+    ViewData["Title"] = "Chi tiết Môn học";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">Thông tin Môn học</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Tên môn học</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+
+                <dt class="col-sm-3">Mô tả</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
+            </dl>
+        </div>
+        <div class="card-footer text-muted">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Sửa</a>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </div>
+</div>
