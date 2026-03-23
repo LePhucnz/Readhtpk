@@ -1,0 +1,131 @@
+﻿@model Readhtpk.Models.Import.QuestionImportViewModel
+
+@{
+    ViewData["Title"] = "Import Câu hỏi từ Excel";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <!-- Card Hướng dẫn -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Hướng dẫn Import</h5>
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li>Tải <a href="/templates/Question_Template.xlsx" class="fw-bold">file mẫu tại đây</a> (hoặc tự tạo theo cấu trúc bên dưới).</li>
+                        <li>Nhập dữ liệu câu hỏi vào file Excel, giữ nguyên tiêu đề cột.</li>
+                        <li>Chọn <strong>Môn học</strong> mà các câu hỏi này thuộc về.</li>
+                        <li>Chọn file Excel và nhấn <strong>Import</strong>.</li>
+                    </ol>
+                    <div class="alert alert-light border">
+                        <strong>Cấu trúc file Excel:</strong><br>
+                        <code>Content | AnswerA | AnswerB | AnswerC | AnswerD | CorrectAnswer | Explanation | Difficulty | IsActive</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Form Import -->
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-upload"></i> Chọn file để Import</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Import" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="SubjectId" class="form-label">Môn học *</label>
+                            <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.SubjectId">
+                                <option value="">-- Chọn Môn học --</option>
+                            </select>
+                            <span asp-validation-for="SubjectId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="File" class="form-label">File Excel (.xlsx) *</label>
+                            <input asp-for="File" class="form-control" type="file" accept=".xlsx" />
+                            <span asp-validation-for="File" class="text-danger"></span>
+                            <div class="form-text">Chỉ hỗ trợ file .xlsx (Excel 2007+)</div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary me-md-2">Quay lại</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-cloud-upload"></i> Import ngay
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Card Kết quả Import (Hiển thị sau khi submit) -->
+            @if (Model?.Results != null && Model.Results.Any())
+            {
+                <div class="card shadow mt-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Kết quả Import</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="alert alert-success mb-0">
+                                    <strong>hành công:</strong> @Model.SuccessCount
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="alert alert-danger mb-0">
+                                    <strong>Thất bại:</strong> @Model.FailedCount
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="alert alert-info mb-0">
+                                    <strong>Tổng cộng:</strong> @Model.TotalRows
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (Model.FailedCount > 0)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Dòng</th>
+                                            <th>Nội dung</th>
+                                            <th>Trạng thái</th>
+                                            <th>Lỗi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Results.Where(r => !r.IsSuccess))
+                                        {
+                                            <tr class="table-danger">
+                                                <td>@item.RowNumber</td>
+                                                <td>@item.Content</td>
+                                                <td><span class="badge bg-danger">Lỗi</span></td>
+                                                <td class="text-danger small">@item.ErrorMessage</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-success">
+                                🎉 Tất cả @Model.SuccessCount câu hỏi đã được import thành công!
+                                <a asp-action="Index" class="btn btn-outline-success btn-sm ms-2">Xem danh sách</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
