@@ -1,0 +1,74 @@
+﻿@model Readhtpk.Models.Question
+
+@{
+    ViewData["Title"] = "Chi tiết Câu hỏi";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">Thông tin Câu hỏi</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Nội dung</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.Content)</dd>
+
+                <dt class="col-sm-3">Môn học</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.Subject.Name)</dd>
+
+                <dt class="col-sm-3">Đáp án A</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.AnswerA)</dd>
+
+                <dt class="col-sm-3">Đáp án B</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.AnswerB)</dd>
+
+                <dt class="col-sm-3">Đáp án C</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.AnswerC)</dd>
+
+                <dt class="col-sm-3">Đáp án D</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.AnswerD)</dd>
+
+                <dt class="col-sm-3">Đáp án đúng</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-success">@Html.DisplayFor(m => m.CorrectAnswer)</span>
+                </dd>
+
+                <dt class="col-sm-3">Giải thích</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.Explanation)</dd>
+
+                <dt class="col-sm-3">Độ khó</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Difficulty == 1)
+                    {
+                        <span class="badge bg-success">Dễ</span>
+                    }
+                    else if (Model.Difficulty == 2)
+                    {
+                        <span class="badge bg-warning text-dark">Trung bình</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Khó</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Trạng thái</dt>
+                <dd class="col-sm-9">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Hoạt động</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Ngừng</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer text-muted">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Sửa</a>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </div>
+</div>

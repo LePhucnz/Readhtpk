@@ -29,14 +29,14 @@ namespace Readhtpk.Data
                 .HasOne(eq => eq.Exam)
                 .WithMany(e => e.ExamQuestions)
                 .HasForeignKey(eq => eq.ExamId)
-                .OnDelete(DeleteBehavior.Restrict); // ← QUAN TRỌNG: Không cascade delete
+                .OnDelete(DeleteBehavior.Restrict); 
 
             // Quan hệ ExamQuestion → Question (NO ACTION khi xóa)
             modelBuilder.Entity<ExamQuestion>()
                 .HasOne(eq => eq.Question)
                 .WithMany(q => q.ExamQuestions)
                 .HasForeignKey(eq => eq.QuestionId)
-                .OnDelete(DeleteBehavior.Restrict); // ← QUAN TRỌNG: Không cascade delete
+                .OnDelete(DeleteBehavior.Restrict); 
 
             // Cấu hình Subject
             modelBuilder.Entity<Subject>(entity =>

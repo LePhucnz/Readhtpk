@@ -1,0 +1,89 @@
+﻿@model Readhtpk.Models.Question
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">Cập nhật Câu hỏi</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="mb-3">
+                            <label asp-for="Content" class="form-label">Nội dung câu hỏi</label>
+                            <textarea asp-for="Content" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="SubjectId" class="form-label">Môn học</label>
+                            <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.SubjectId"></select>
+                            <span asp-validation-for="SubjectId" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AnswerA" class="form-label">Đáp án A</label>
+                                <input asp-for="AnswerA" class="form-control" />
+                                <span asp-validation-for="AnswerA" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AnswerB" class="form-label">Đáp án B</label>
+                                <input asp-for="AnswerB" class="form-control" />
+                                <span asp-validation-for="AnswerB" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AnswerC" class="form-label">Đáp án C</label>
+                                <input asp-for="AnswerC" class="form-control" />
+                                <span asp-validation-for="AnswerC" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AnswerD" class="form-label">Đáp án D</label>
+                                <input asp-for="AnswerD" class="form-control" />
+                                <span asp-validation-for="AnswerD" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CorrectAnswer" class="form-label">Đáp án đúng (A/B/C/D)</label>
+                            <input asp-for="CorrectAnswer" class="form-control" />
+                            <span asp-validation-for="CorrectAnswer" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Explanation" class="form-label">Giải thích đáp án</label>
+                            <textarea asp-for="Explanation" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="Explanation" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Difficulty" class="form-label">Độ khó</label>
+                            <select asp-for="Difficulty" class="form-select">
+                                <option value="1">Dễ</option>
+                                <option value="2">Trung bình</option>
+                                <option value="3">Khó</option>
+                            </select>
+                            <span asp-validation-for="Difficulty" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input asp-for="IsActive" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label">Hoạt động</label>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary me-md-2">Quay lại</a>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

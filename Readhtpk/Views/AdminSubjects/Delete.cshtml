@@ -1,0 +1,29 @@
+﻿@model Readhtpk.Models.Subject
+
+@{
+    ViewData["Title"] = "Xóa Môn học";
+}
+
+<div class="container mt-4">
+    <div class="card border-danger shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Xác nhận Xóa</h4>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Bạn có chắc chắn muốn xóa môn học này?</h5>
+            <div class="alert alert-warning">
+                <strong>Lưu ý:</strong> Hành động này không thể hoàn tác.
+            </div>
+            <dl class="row">
+                <dt class="col-sm-3">Tên môn học</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+            </dl>
+            
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-danger">Xóa vĩnh viễn</button>
+                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </form>
+        </div>
+    </div>
+</div>
