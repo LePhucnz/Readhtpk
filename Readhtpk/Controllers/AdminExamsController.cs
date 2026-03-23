@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Readhtpk.Data;
 using Readhtpk.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Readhtpk.Controllers
 {
+    [Authorize(Roles = "Admin,Teacher")]
     public class AdminExamsController : Controller
     {
         private readonly ApplicationDbContext _context;

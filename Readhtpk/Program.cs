@@ -7,7 +7,6 @@ using Readhtpk.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -20,7 +19,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
             errorNumbersToAdd: null);
     }));
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => {
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     options.SignIn.RequireConfirmedAccount = false;
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
@@ -31,7 +30,18 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => {
     options.Lockout.MaxFailedAccessAttempts = 5;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
-.AddDefaultTokenProviders();
+.AddDefaultTokenProviders()
+.AddDefaultUI();  
+
+// Cấu hình cookie cho Identity
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login"; 
+    options.LogoutPath = "/Identity/Account/Logout";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.SlidingExpiration = true;
+});
 
 // Register services
 builder.Services.AddScoped<IQuestionService, QuestionService>();
@@ -41,23 +51,20 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// ✅ SEED DATA - FIX DEADLOCK
+// SEED DATA
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        // Dùng GetAwaiter().GetResult() thay vì await để tránh deadlock
-        // Thêm ConfigureAwait(false) bên trong SeedData đã xử lý ở file riêng
         SeedData.Initialize(services).GetAwaiter().GetResult();
-        Console.WriteLine("✅ Seed data completed successfully");
+        Console.WriteLine("Seed data completed successfully");
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "❌ An error occurred while seeding the database: {Message}", ex.Message);
-        Console.WriteLine($"❌ Seed error: {ex.Message}");
-        // Không crash app, vẫn chạy tiếp để bro debug
+        logger.LogError(ex, "An error occurred while seeding the database: {Message}", ex.Message);
+        Console.WriteLine($"Seed error: {ex.Message}");
     }
 }
 
@@ -70,9 +77,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -9,9 +9,11 @@ using Readhtpk.Data;
 using Readhtpk.Models;
 using Readhtpk.Models.Import;
 using Readhtpk.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Readhtpk.Controllers
 {
+    [Authorize(Roles = "Admin,Teacher")]
     public class AdminQuestionsController : Controller
     {
         private readonly ApplicationDbContext _context;

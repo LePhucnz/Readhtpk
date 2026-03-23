@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Readhtpk.Data; // Kiểm tra namespace DbContext của bạn
 using Readhtpk.Models; // Kiểm tra namespace Model của bạn
+using Microsoft.AspNetCore.Authorization;
 
 namespace Readhtpk.Controllers
 {
+    [Authorize(Roles = "Admin,Teacher")]
     public class AdminSubjectsController : Controller
     {
         private readonly ApplicationDbContext _context;
