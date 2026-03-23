@@ -1,0 +1,56 @@
+﻿@model Readhtpk.Controllers.EditUserViewModel
+
+@{
+    ViewData["Title"] = "Sửa Tài khoản";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">Cập nhật Tài khoản</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label">Họ tên</label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NewRole" class="form-label">Phân quyền</label>
+                            <select asp-for="NewRole" class="form-select" asp-items="ViewBag.Roles">
+                                <option value="">-- Chọn Role --</option>
+                            </select>
+                            <span asp-validation-for="NewRole" class="text-danger"></span>
+                            @if (!string.IsNullOrEmpty(Model.CurrentRole))
+                            {
+                                <div class="form-text">Hiện tại: <strong>@Model.CurrentRole</strong></div>
+                            }
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary me-md-2">Quay lại</a>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
