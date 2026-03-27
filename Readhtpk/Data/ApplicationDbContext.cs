@@ -15,6 +15,8 @@ namespace Readhtpk.Data
         public DbSet<Question> Questions { get; set; }
         public DbSet<Exam> Exams { get; set; }
         public DbSet<ExamQuestion> ExamQuestions { get; set; }
+        public DbSet<ExamResult> ExamResults { get; set; }
+        public DbSet<UserAnswer> UserAnswers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -56,6 +58,38 @@ namespace Readhtpk.Data
             modelBuilder.Entity<Exam>(entity =>
             {
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(500);
+            });
+
+            // Cấu hình ExamResult
+            modelBuilder.Entity<ExamResult>(entity =>
+            {
+                entity.HasOne(er => er.User)
+                    .WithMany()
+                    .HasForeignKey(er => er.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(er => er.Exam)
+                    .WithMany()
+                    .HasForeignKey(er => er.ExamId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(er => er.Status).HasMaxLength(20);
+            });
+
+            // Cấu hình UserAnswer
+            modelBuilder.Entity<UserAnswer>(entity =>
+            {
+                entity.HasOne(ua => ua.ExamResult)
+                    .WithMany(er => er.UserAnswers)
+                    .HasForeignKey(ua => ua.ExamResultId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(ua => ua.Question)
+                    .WithMany()
+                    .HasForeignKey(ua => ua.QuestionId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(ua => ua.SelectedAnswer).HasMaxLength(1);
             });
         }
     }

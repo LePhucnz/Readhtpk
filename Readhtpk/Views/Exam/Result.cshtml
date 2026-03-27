@@ -1,0 +1,61 @@
+﻿@model Readhtpk.Models.ExamResult
+@{
+    ViewData["Title"] = "Kết quả thi";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4>📊 Kết quả bài thi</h4>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">@Model.Exam.Title</h5>
+            <p class="card-text">
+                <strong>Môn:</strong> @Model.Exam.Subject?.Name <br />
+                <strong>Thời gian bắt đầu:</strong> @Model.StartTime.ToString("dd/MM/yyyy HH:mm") <br />
+                <strong>Thời gian nộp:</strong> @(Model.EndTime?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa nộp") <br />
+                <strong>Trạng thái:</strong>
+                <span class="badge @(Model.Status == "Submitted" ? "bg-success" : "bg-warning")">
+                    @Model.Status
+                </span>
+            </p>
+            
+            <div class="alert alert-success">
+                <h3>🎯 Điểm số: @Model.Score / @Model.Exam.TotalMarks</h3>
+            </div>
+
+            <h5 class="mt-4">Chi tiết câu trả lời:</h5>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Câu hỏi</th>
+                        <th>Đáp án của bạn</th>
+                        <th>Kết quả</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ua in Model.UserAnswers)
+                    {
+                        var isCorrect = ua.Question.CorrectAnswer?.ToUpper() == ua.SelectedAnswer?.ToUpper();
+                        <tr class="@(isCorrect ? "table-success" : "table-danger")">
+                            <td>@ua.Question.Content</td>
+                            <td>@ua.SelectedAnswer</td>
+                            <td>
+                                @if (isCorrect)
+                                {
+                                    <span class="text-success">✅ Đúng</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">❌ Sai (Đáp án: @ua.Question.CorrectAnswer)</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <a asp-action="History" class="btn btn-secondary">← Quay lại lịch sử</a>
+        </div>
+    </div>
+</div>
