@@ -1,0 +1,76 @@
+﻿@model IEnumerable<Readhtpk.Models.ExamQuestion>
+
+@{
+    ViewData["Title"] = "Câu hỏi trong đề thi";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="bi bi-list-check"></i> Câu hỏi trong đề: @ViewBag.ExamTitle</h2>
+        <div>
+            <a asp-action="AddToExam" asp-route-examId="@ViewBag.ExamId" class="btn btn-success">
+                <i class="bi bi-plus-lg"></i> Thêm câu hỏi
+            </a>
+            <a asp-controller="AdminExams" asp-action="Index" class="btn btn-secondary">
+                ← Quay lại
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="alert alert-info">
+                <strong>Tổng số câu:</strong> @ViewBag.TotalQuestions |
+                <strong>Tổng điểm:</strong> @ViewBag.TotalMarks
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-warning">
+                    Đề thi chưa có câu hỏi nào.
+                    <a asp-action="AddToExam" asp-route-examId="@ViewBag.ExamId">Thêm câu hỏi ngay</a>
+                </div>
+            }
+            else
+            {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Nội dung</th>
+                            <th>Đáp án đúng</th>
+                            <th>Điểm</th>
+                            <th style="width: 150px;">Chức năng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var eq in Model)
+                        {
+                            <tr>
+                                <td>@eq.Order</td>
+                                <td>@eq.Question.Content</td>
+                                <td><span class="badge bg-primary">@eq.Question.CorrectAnswer</span></td>
+                                <td>@eq.Marks điểm</td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-examId="@eq.ExamId" asp-route-questionId="@eq.QuestionId"
+                                       class="btn btn-sm btn-warning">Sửa</a>
+                                    <form asp-action="Delete" asp-route-examId="@eq.ExamId" asp-route-questionId="@eq.QuestionId"
+                                          method="post" class="d-inline"
+                                          onsubmit="return confirm('Xóa câu hỏi này khỏi đề thi?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>

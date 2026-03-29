@@ -1,0 +1,88 @@
+﻿@model IEnumerable<Readhtpk.Models.Question>
+
+@{
+    ViewData["Title"] = "Thêm câu hỏi vào đề thi";
+}
+
+<div class="container mt-4">
+    <h2><i class="bi bi-plus-circle"></i> Thêm câu hỏi vào đề: @ViewBag.ExamTitle</h2>
+
+    <form asp-action="AddToExam" method="post">
+        <input type="hidden" name="examId" value="@ViewBag.ExamId" />
+        
+        <div class="card shadow-sm mt-3">
+            <div class="card-header bg-light">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="selectAll">
+                    <label class="form-check-label" for="selectAll">
+                        <strong>Chọn tất cả</strong>
+                    </label>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (!Model.Any())
+                {
+                    <div class="alert alert-warning">
+                        Không còn câu hỏi nào chưa được thêm vào đề thi này.
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        @foreach (var q in Model)
+                        {
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input question-checkbox" type="checkbox"
+                                                   name="questionIds" value="@q.Id" id="q_@q.Id">
+                                            <label class="form-check-label" for="q_@q.Id">
+                                                <strong>Câu @q.Id:</strong> @q.Content.Substring(0, Math.Min(100, q.Content.Length))...
+                                            </label>
+                                        </div>
+                                        <div class="mt-2 small text-muted">
+                                            Đáp án: <span class="badge bg-primary">@q.CorrectAnswer</span> |
+                                            Độ khó: @(q.Difficulty == 1 ? "Dễ" : q.Difficulty == 2 ? "TB" : "Khó")
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-success" id="submitBtn" disabled>
+                    <i class="bi bi-check-lg"></i> Thêm đã chọn vào đề thi
+                </button>
+                <a asp-action="ByExam" asp-route-examId="@ViewBag.ExamId" class="btn btn-secondary">Hủy</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        // Select All checkbox
+        document.getElementById('selectAll').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.question-checkbox');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            updateSubmitButton();
+        });
+
+        // Update submit button state
+        function updateSubmitButton() {
+            const checked = document.querySelectorAll('.question-checkbox:checked').length;
+            document.getElementById('submitBtn').disabled = checked === 0;
+            document.getElementById('submitBtn').textContent =
+                checked === 0 ? 'Thêm đã chọn vào đề thi' :
+                `Thêm ${checked} câu hỏi vào đề thi`;
+        }
+
+        // Individual checkbox change
+        document.querySelectorAll('.question-checkbox').forEach(cb => {
+            cb.addEventListener('change', updateSubmitButton);
+        });
+    </script>
+}

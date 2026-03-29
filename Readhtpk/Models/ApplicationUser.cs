@@ -9,4 +9,4 @@ namespace Readhtpk.Models
         public string? Avatar { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
-}
+}   
