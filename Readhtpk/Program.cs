@@ -31,12 +31,12 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders()
-.AddDefaultUI();  
+.AddDefaultUI();
 
 // Cấu hình cookie cho Identity
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Identity/Account/Login"; 
+    options.LoginPath = "/Identity/Account/Login";
     options.LogoutPath = "/Identity/Account/Logout";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
@@ -45,6 +45,16 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // Register services
 builder.Services.AddScoped<IQuestionService, QuestionService>();
+
+// Cấu hình Session cho Exam feature
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -77,9 +87,14 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+// UseSession middleware (phải sau UseRouting)
+app.UseSession();
 
 app.MapControllerRoute(
     name: "areas",

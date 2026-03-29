@@ -1,0 +1,51 @@
+﻿@model IEnumerable<Readhtpk.Models.ExamResult>
+@{
+    ViewData["Title"] = "Lịch sử thi";
+}
+
+<div class="container mt-4">
+    <h3>📚 Lịch sử bài thi của bạn</h3>
+    
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Bạn chưa tham gia kỳ thi nào.</div>
+    }
+    else
+    {
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Đề thi</th>
+                    <th>Môn học</th>
+                    <th>Thời gian</th>
+                    <th>Điểm</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var result in Model)
+                {
+                    <tr>
+                        <td>@result.Exam.Title</td>
+                        <td>@result.Exam.Subject?.Name</td>
+                        <td>@result.StartTime.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td><strong>@result.Score</strong></td>
+                        <td>
+                            <span class="badge @(result.Status == "Submitted" ? "bg-success" : "bg-warning")">
+                                @result.Status
+                            </span>
+                        </td>
+                        <td>
+                            <a asp-action="Result" asp-route-id="@result.Id" class="btn btn-sm btn-info">
+                                Xem chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">← Về trang chủ</a>
+</div>

@@ -1,0 +1,47 @@
+﻿@model Readhtpk.Models.ExamQuestion
+
+@{
+    ViewData["Title"] = "Sửa câu hỏi trong đề";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">Cập nhật câu hỏi</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Nội dung:</strong><br>
+                        @Model.Question.Content
+                    </div>
+
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" name="examId" value="@ViewBag.ExamId" />
+                        <input type="hidden" name="questionId" value="@Model.QuestionId" />
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Thứ tự trong đề</label>
+                            <input type="number" name="Order" value="@Model.Order"
+                                   class="form-control" min="1" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Số điểm</label>
+                            <input type="number" name="Marks" value="@Model.Marks"
+                                   class="form-control" min="0.5" step="0.5" required />
+                            <div class="form-text">Điểm mặc định: 1.0</div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="ByExam" asp-route-examId="@ViewBag.ExamId"
+                               class="btn btn-secondary me-md-2">Quay lại</a>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
