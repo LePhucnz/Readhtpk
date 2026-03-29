@@ -4,58 +4,107 @@
 }
 
 <div class="container mt-4">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h4>📊 Kết quả bài thi</h4>
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">📊 Kết quả bài thi</h4>
+            <span class="badge bg-light text-dark fs-6">Lần làm thứ @Model.AttemptNumber</span>
         </div>
         <div class="card-body">
-            <h5 class="card-title">@Model.Exam.Title</h5>
-            <p class="card-text">
-                <strong>Môn:</strong> @Model.Exam.Subject?.Name <br />
-                <strong>Thời gian bắt đầu:</strong> @Model.StartTime.ToString("dd/MM/yyyy HH:mm") <br />
-                <strong>Thời gian nộp:</strong> @(Model.EndTime?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa nộp") <br />
-                <strong>Trạng thái:</strong>
-                <span class="badge @(Model.Status == "Submitted" ? "bg-success" : "bg-warning")">
-                    @Model.Status
-                </span>
-            </p>
-            
-            <div class="alert alert-success">
-                <h3>🎯 Điểm số: @Model.Score / @Model.Exam.TotalMarks</h3>
+            <!-- Thông tin chung -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5 class="card-title">@Model.Exam.Title</h5>
+                    <p class="mb-1"><strong>Môn:</strong> @Model.Exam.Subject?.Name</p>
+                    <p class="mb-1"><strong>Thời gian:</strong> @Model.StartTime.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="alert alert-success d-inline-block mb-0">
+                        <h3 class="mb-0">🎯 @Model.Score / @Model.Exam.TotalMarks điểm</h3>
+                    </div>
+                </div>
             </div>
 
-            <h5 class="mt-4">Chi tiết câu trả lời:</h5>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Câu hỏi</th>
-                        <th>Đáp án của bạn</th>
-                        <th>Kết quả</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var ua in Model.UserAnswers)
-                    {
-                        var isCorrect = ua.Question.CorrectAnswer?.ToUpper() == ua.SelectedAnswer?.ToUpper();
-                        <tr class="@(isCorrect ? "table-success" : "table-danger")">
-                            <td>@ua.Question.Content</td>
-                            <td>@ua.SelectedAnswer</td>
-                            <td>
-                                @if (isCorrect)
-                                {
-                                    <span class="text-success">✅ Đúng</span>
-                                }
-                                else
-                                {
-                                    <span class="text-danger">❌ Sai (Đáp án: @ua.Question.CorrectAnswer)</span>
-                                }
-                            </td>
+            <!-- Chi tiết câu trả lời -->
+            <h5 class="mb-3">📝 Chi tiết câu trả lời:</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 5%">#</th>
+                            <th style="width: 40%">Câu hỏi</th>
+                            <th style="width: 15%">Đáp án của bạn</th>
+                            <th style="width: 15%">Đáp án đúng</th>
+                            <th style="width: 25%">Giải thích</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @{
+                            int qIndex = 0;
+                        }
+                        @foreach (var ua in Model.UserAnswers)
+                        {
+                            qIndex++;
+                            var isCorrect = ua.Question.CorrectAnswer?.ToUpper() == ua.SelectedAnswer?.ToUpper();
+                            
+                            // Lấy nội dung đáp án đúng để hiển thị
+                            string correctContent = ua.Question.CorrectAnswer switch
+                            {
+                                "A" => ua.Question.AnswerA,
+                                "B" => ua.Question.AnswerB,
+                                "C" => ua.Question.AnswerC,
+                                "D" => ua.Question.AnswerD,
+                                _ => "N/A"
+                            };
 
-            <a asp-action="History" class="btn btn-secondary">← Quay lại lịch sử</a>
+                            <tr class="@(isCorrect ? "table-success" : "table-danger")">
+                                <td class="text-center fw-bold">@qIndex</td>
+                                <td>@ua.Question.Content</td>
+                                <td class="text-center">
+                                    <span class="badge @(isCorrect ? "bg-success" : "bg-danger")">
+                                        @ua.SelectedAnswer
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-info text-dark">
+                                        @ua.Question.CorrectAnswer (@correctContent)
+                                    </span>
+                                </td>
+                                <td class="small text-muted">
+                                    @if (!string.IsNullOrEmpty(ua.Question.Explanation))
+                                    {
+                                        <i class="bi bi-info-circle"></i> 
+                                        @ua.Question.Explanation
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Nút điều hướng -->
+            <div class="mt-4 d-flex gap-2 flex-wrap">
+                <a asp-action="History" asp-route-examId="@Model.ExamId" class="btn btn-secondary">
+                    ← Lịch sử đề này
+                </a>
+                <a asp-action="History" class="btn btn-outline-secondary">
+                    📚 Tất cả lịch sử
+                </a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">
+                    🏠 Về trang chủ
+                </a>
+                
+                @if (Model.Status == "Submitted" || Model.Status == "Timeout")
+                {
+                    <a asp-action="Retake" asp-route-id="@Model.ExamId" class="btn btn-warning text-dark">
+                        🔄 Làm lại bài (Xáo trộn câu hỏi)
+                    </a>
+                }
+            </div>
         </div>
     </div>
 </div>

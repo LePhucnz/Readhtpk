@@ -20,42 +20,58 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || User.IsInRole("Teacher")))
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button"
-                                       data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-gear"></i> Quản lý
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="AdminSubjects" asp-action="Index">
-                                            <i class="bi bi-book"></i> Môn học
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="AdminQuestions" asp-action="Index">
-                                            <i class="bi bi-question-circle"></i> Câu hỏi
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="AdminExams" asp-action="Index">
-                                            <i class="bi bi-file-earmark-text"></i> Đề thi
-                                        </a>
-                                    </li>
-                                    
-                                    <!-- Chỉ Admin thấy menu Quản lý User -->
-                                    @if (User.IsInRole("Admin"))
-                                    {
-                                        <li><hr class="dropdown-divider"></li>
+                            @if (User.IsInRole("Student"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="AdminExams" asp-action="Index" asp-area="">
+                                        <i class="bi bi-journal-check"></i> Đề thi
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Exam" asp-action="History">
+                                        <i class="bi bi-clock-history"></i> Lịch sử thi
+                                    </a>
+                                </li>
+                            }
+
+                            @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button"
+                                           data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-gear"></i> Quản lý
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
                                         <li>
-                                            <a class="dropdown-item text-danger" asp-controller="AdminUsers" asp-action="Index">
-                                                <i class="bi bi-people"></i> Quản lý User
+                                            <a class="dropdown-item" asp-controller="AdminSubjects" asp-action="Index">
+                                                <i class="bi bi-book"></i> Môn học
                                             </a>
                                         </li>
-                                    }
-                                </ul>
-                            </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="AdminQuestions" asp-action="Index">
+                                                <i class="bi bi-question-circle"></i> Câu hỏi
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="AdminExams" asp-action="Index">
+                                                <i class="bi bi-file-earmark-text"></i> Đề thi
+                                            </a>
+                                        </li>
+                                        
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <a class="dropdown-item text-danger" asp-controller="AdminUsers" asp-action="Index">
+                                                    <i class="bi bi-people"></i> Quản lý User
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
                         }
                     </ul>
                     <partial name="_LoginPartial" />
@@ -65,7 +81,7 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
-            @RenderBody()
+            @RenderBody()  <!-- ✅ QUAN TRỌNG: Phải có dòng này -->
         </main>
     </div>
 

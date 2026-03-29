@@ -1,48 +1,120 @@
 ﻿@model IEnumerable<Readhtpk.Models.Exam>
+@using System.Security.Claims
+
+@{
+    // Kiểm tra role của user
+    var isStudent = User.IsInRole("Student") && !User.IsInRole("Admin") && !User.IsInRole("Teacher");
+    var isAdminOrTeacher = User.IsInRole("Admin") || User.IsInRole("Teacher");
+}
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2><i class="bi bi-file-earmark-text"></i> Danh sách Đề thi</h2>
-        <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Tạo mới</a>
+        
+        @* ✅ CHỈ Admin/Teacher thấy nút Tạo mới *@
+        @if (isAdminOrTeacher)
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Tạo mới
+            </a>
+        }
     </div>
+
+    @if (isStudent)
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            <strong>Chào mừng bạn đến với phòng thi!</strong><br />
+            Chọn đề thi bên dưới và bấm "Làm bài" để bắt đầu.
+        </div>
+    }
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <table class="table table-hover table-bordered">
-                <thead class="table-light">
-                    <tr>
-                        <th>Tên đề</th>
-                        <th>Môn học</th>
-                        <th>Thời lượng (phút)</th>
-                        <th>Số câu</th>
-                        <th>Tổng điểm</th>
-                        <th>Ngày thi</th>
-                        <th style="width: 150px;">Chức năng</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach (var item in Model)
+            @if (!Model.Any())
+            {
+                <div class="alert alert-warning text-center">
+                    @if (isStudent)
                     {
-                        <tr>
-                            <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Subject.Name)</td>
-                            <td>@Html.DisplayFor(modelItem => item.DurationMinutes)</td>
-                            <td>@Html.DisplayFor(modelItem => item.TotalQuestions)</td>
-                            <td>@Html.DisplayFor(modelItem => item.TotalMarks)</td>
-                            <td>@item.ExamDate.ToString("dd/MM/yyyy HH:mm")</td>
-                            <td>
-                                <a asp-controller="ExamQuestions" asp-action="ByExam" asp-route-examId="@item.Id"
-                                       class="btn btn-sm btn-info mb-1">
-                                    <i class="bi bi-list-check"></i> Câu hỏi
-                                </a>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Sửa</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Xóa</a>
-                            </td>
-                        </tr>
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Không có đề thi nào khả dụng.</strong>
+
+                        <br />
+                        <small>Vui lòng quay lại sau hoặc liên hệ giáo viên để được hỗ trợ.</small>
                     }
-                </tbody>
-            </table>
+                    else
+                    {
+                        <i class="bi bi-info-circle">Chưa có đề thi nào.Bấm "Tạo mới" để thêm đề thi đầu tiên.</i>
+                    }
+                </div>
+            }
+            else
+            {
+                <table class="table table-hover table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tên đề</th>
+                            <th>Môn học</th>
+                            <th>Thời lượng (phút)</th>
+                            <th>Số câu</th>
+                            <th>Tổng điểm</th>
+                            <th>Ngày thi</th>
+                            <th style="width: @(isStudent ? "120px" : "220px")">Chức năng</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Subject.Name)</td>
+                                <td>@Html.DisplayFor(modelItem => item.DurationMinutes)</td>
+                                <td>@Html.DisplayFor(modelItem => item.TotalQuestions)</td>
+                                <td>@Html.DisplayFor(modelItem => item.TotalMarks)</td>
+                                <td>@item.ExamDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    @* ✅ Student: Chỉ thấy nút Làm bài *@
+                                    @if (isStudent)
+                                    {
+                                        <a asp-controller="Exam"
+                                               asp-action="TakeExam"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-sm btn-success w-100">
+                                            <i class="bi bi-play-fill"></i> Làm bài
+                                        </a>
+                                    }
+                                    
+                                    @* ✅ Admin/Teacher: Thấy đầy đủ chức năng *@
+                                    @if (isAdminOrTeacher)
+                                    {
+                                        <div class="btn-group-vertical w-100">
+                                            <a asp-controller="ExamQuestions" asp-action="ByExam" asp-route-examId="@item.Id"
+                                                   class="btn btn-sm btn-info mb-1">
+                                                <i class="bi bi-list-check"></i> Câu hỏi
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning mb-1">Sửa</a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger mb-1">Xóa</a>
+                                            <a asp-controller="Exam"
+                                                   asp-action="History"
+                                                   asp-route-examId="@item.Id"
+                                                   class="btn btn-sm btn-secondary mb-1">
+                                                <i class="bi bi-clock-history"></i> Lịch sử
+                                            </a>
+                                            <a asp-controller="Exam"
+                                                   asp-action="TakeExam"
+                                                   asp-route-id="@item.Id"
+                                                   class="btn btn-sm btn-success">
+                                                <i class="bi bi-play-fill"></i> Làm bài
+                                            </a>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
         </div>
     </div>
 </div>

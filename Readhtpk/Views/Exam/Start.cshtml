@@ -4,6 +4,16 @@
     int index = 0;
 }
 
+@if (ViewBag.IsRetake == true)
+{
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong>🔄 Làm lại bài thi!</strong> Câu hỏi và đáp án đã được xáo trộn ngẫu nhiên.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Rest of the view... -->
+
 <div class="container mt-4">
     <div class="exam-header card mb-4">
         <div class="card-body">

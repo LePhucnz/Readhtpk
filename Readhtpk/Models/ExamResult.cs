@@ -4,22 +4,17 @@
     public class ExamResult
     {
         public int Id { get; set; }
-
-        // Foreign Key to User
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
-
-        // Foreign Key to Exam
+        public string UserId { get; set; } = null!;
+        public ApplicationUser? User { get; set; }
         public int ExamId { get; set; }
-        public Exam Exam { get; set; }
-
+        public Exam? Exam { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public double Score { get; set; }
-        public string Status { get; set; } = "InProgress"; // InProgress, Submitted, Timeout
+        public string Status { get; set; } = "InProgress";
+        public int AttemptNumber { get; set; } = 1; // ✅ Số lần làm bài
 
-        // Navigation property
-        public ICollection<UserAnswer> UserAnswers { get; set; }
+        public ICollection<UserAnswer> UserAnswers { get; set; } = new List<UserAnswer>();
     }
     // UserAnswer.cs
     public class UserAnswer
