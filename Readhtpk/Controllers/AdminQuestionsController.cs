@@ -146,14 +146,37 @@ namespace Readhtpk.Controllers
         // POST: AdminQuestions/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]  // Chỉ Admin mới xóa được
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var question = await _context.Questions.FindAsync(id);
-            if (question != null)
+            var question = await _context.Questions
+                .Include(q => q.ExamQuestions)  // Include để kiểm tra xem có trong đề thi không
+                .FirstOrDefaultAsync(q => q.Id == id);
+
+            if (question == null)
+            {
+                TempData["Error"] = "Không tìm thấy câu hỏi!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Kiểm tra xem câu hỏi có đang được sử dụng trong đề thi không
+            if (question.ExamQuestions != null && question.ExamQuestions.Any())
+            {
+                TempData["Error"] = $"Không thể xóa câu hỏi này vì nó đang được sử dụng trong {question.ExamQuestions.Count} đề thi!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
             {
                 _context.Questions.Remove(question);
                 await _context.SaveChangesAsync();
+                TempData["Success"] = "Xóa câu hỏi thành công!";
             }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Lỗi khi xóa: {ex.Message}";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 

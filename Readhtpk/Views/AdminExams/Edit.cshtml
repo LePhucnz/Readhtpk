@@ -1,77 +1,249 @@
-﻿@model Readhtpk.Models.Exam
+﻿@model Readhtpk.Models.ViewModels.ExamCreateViewModel
+
+@{
+    ViewData["Title"] = "Sửa Đề thi";
+}
 
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-warning text-dark">
-                    <h4 class="mb-0">Cập nhật Đề thi</h4>
+    <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0">✏️ Cập nhật Đề thi</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                
+                <!-- Thông tin đề thi -->
+                <h5 class="mb-3">ℹ️ Thông tin đề thi</h5>
+                
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">Tên đề thi</label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
                 </div>
-                <div class="card-body">
-                    <form asp-action="Edit">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" asp-for="Id" />
-                        
-                        <div class="mb-3">
-                            <label asp-for="Title" class="form-label">Tên đề thi</label>
-                            <input asp-for="Title" class="form-control" />
-                            <span asp-validation-for="Title" class="text-danger"></span>
-                        </div>
 
-                        <div class="mb-3">
-                            <label asp-for="SubjectId" class="form-label">Môn học</label>
-                            <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.SubjectId"></select>
-                            <span asp-validation-for="SubjectId" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Description" class="form-label">Mô tả</label>
-                            <textarea asp-for="Description" class="form-control" rows="2"></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="DurationMinutes" class="form-label">Thời lượng (phút)</label>
-                                <input asp-for="DurationMinutes" class="form-control" type="number" />
-                                <span asp-validation-for="DurationMinutes" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="TotalQuestions" class="form-label">Số câu hỏi</label>
-                                <input asp-for="TotalQuestions" class="form-control" type="number" />
-                                <span asp-validation-for="TotalQuestions" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="TotalMarks" class="form-label">Tổng điểm</label>
-                                <input asp-for="TotalMarks" class="form-control" type="number" step="0.5" />
-                                <span asp-validation-for="TotalMarks" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="ExamDate" class="form-label">Ngày thi</label>
-                            <input asp-for="ExamDate" class="form-control" type="datetime-local" />
-                            <span asp-validation-for="ExamDate" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="CreatedBy" class="form-label">Người tạo</label>
-                            <input asp-for="CreatedBy" class="form-control" />
-                            <span asp-validation-for="CreatedBy" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3 form-check">
-                            <input asp-for="IsActive" class="form-check-input" />
-                            <label asp-for="IsActive" class="form-check-label">Hoạt động</label>
-                        </div>
-
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a asp-action="Index" class="btn btn-secondary me-md-2">Quay lại</a>
-                            <button type="submit" class="btn btn-primary">Cập nhật</button>
-                        </div>
-                    </form>
+                <div class="mb-3">
+                    <label asp-for="SubjectId" class="form-label">Môn học</label>
+                    <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.SubjectId">
+                        <option value="">-- Chọn Môn học --</option>
+                    </select>
+                    <span asp-validation-for="SubjectId" class="text-danger"></span>
                 </div>
-            </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Mô tả</label>
+                    <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="DurationMinutes" class="form-label">Thời lượng (phút)</label>
+                        <input asp-for="DurationMinutes" class="form-control" type="number" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="ExamDate" class="form-label">Ngày thi</label>
+                        <input asp-for="ExamDate" class="form-control" type="datetime-local" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="CreatedBy" class="form-label">Người tạo</label>
+                        <input asp-for="CreatedBy" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label">Hoạt động</label>
+                </div>
+
+                <hr class="my-4" />
+
+                <!-- PHẦN CÂU HỎI ĐỘNG -->
+                <h5 class="mb-3">📝 Câu hỏi trong đề thi</h5>
+                
+                <div id="questionsContainer">
+                    <!-- Các câu hỏi sẽ được load vào đây -->
+                </div>
+
+                <button type="button" class="btn btn-success mb-3" onclick="addQuestion()">
+                    <i class="bi bi-plus-circle"></i> Thêm câu hỏi mới
+                </button>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <a asp-action="Index" class="btn btn-secondary me-md-2">Quay lại</a>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-lg"></i> Cập nhật
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        let questionIndex = 0;
+        const existingQuestions = @Json.Serialize(Model.Questions);
+
+        // Load các câu hỏi có sẵn khi trang load
+        document.addEventListener('DOMContentLoaded', function() {
+            existingQuestions.forEach((q, index) => {
+                loadExistingQuestion(q, index);
+            });
+            questionIndex = existingQuestions.length;
+        });
+
+        function loadExistingQuestion(q, index) {
+            const container = document.getElementById('questionsContainer');
+            const questionHtml = `
+                <div class="card mb-3 question-card" id="question_${index}">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <strong>Câu hỏi ${index + 1}</strong>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeQuestion(${index})">
+                            <i class="bi bi-trash"></i> Xóa
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nội dung câu hỏi</label>
+                            <textarea name="Questions[${index}].Content" class="form-control" rows="2" required>${q.content || ''}</textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <input type="text" name="Questions[${index}].AnswerA" class="form-control" placeholder="Đáp án A" required value="${q.answerA || ''}" />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <input type="text" name="Questions[${index}].AnswerB" class="form-control" placeholder="Đáp án B" required value="${q.answerB || ''}" />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <input type="text" name="Questions[${index}].AnswerC" class="form-control" placeholder="Đáp án C" value="${q.answerC || ''}" />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <input type="text" name="Questions[${index}].AnswerD" class="form-control" placeholder="Đáp án D" value="${q.answerD || ''}" />
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                <label class="form-label">Đáp án đúng</label>
+                                <select name="Questions[${index}].CorrectAnswer" class="form-select" required>
+                                    <option value="A" ${q.correctAnswer === 'A' ? 'selected' : ''}>A</option>
+                                    <option value="B" ${q.correctAnswer === 'B' ? 'selected' : ''}>B</option>
+                                    <option value="C" ${q.correctAnswer === 'C' ? 'selected' : ''}>C</option>
+                                    <option value="D" ${q.correctAnswer === 'D' ? 'selected' : ''}>D</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Độ khó</label>
+                                <select name="Questions[${index}].Difficulty" class="form-select">
+                                    <option value="1" ${q.difficulty === 1 ? 'selected' : ''}>Dễ</option>
+                                    <option value="2" ${q.difficulty === 2 ? 'selected' : ''}>Trung bình</option>
+                                    <option value="3" ${q.difficulty === 3 ? 'selected' : ''}>Khó</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Điểm</label>
+                                <input type="number" name="Questions[${index}].Marks" class="form-control" value="${q.marks || 1}" step="0.5" min="0.5" />
+                            </div>
+                        </div>
+
+                        <div class="mb-2 mt-2">
+                            <label class="form-label">Giải thích</label>
+                            <textarea name="Questions[${index}].Explanation" class="form-control" rows="1">${q.explanation || ''}</textarea>
+                        </div>
+
+                        <input type="hidden" name="Questions[${index}].IsActive" value="true" />
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', questionHtml);
+        }
+
+        function addQuestion() {
+            const container = document.getElementById('questionsContainer');
+            const questionHtml = `
+                <div class="card mb-3 question-card" id="question_${questionIndex}">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <strong>Câu hỏi ${questionIndex + 1}</strong>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeQuestion(${questionIndex})">
+                            <i class="bi bi-trash"></i> Xóa
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nội dung câu hỏi</label>
+                            <textarea name="Questions[${questionIndex}].Content" class="form-control" rows="2" required></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <input type="text" name="Questions[${questionIndex}].AnswerA" class="form-control" placeholder="Đáp án A" required />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <input type="text" name="Questions[${questionIndex}].AnswerB" class="form-control" placeholder="Đáp án B" required />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <input type="text" name="Questions[${questionIndex}].AnswerC" class="form-control" placeholder="Đáp án C" />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <input type="text" name="Questions[${questionIndex}].AnswerD" class="form-control" placeholder="Đáp án D" />
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                <label class="form-label">Đáp án đúng</label>
+                                <select name="Questions[${questionIndex}].CorrectAnswer" class="form-select" required>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="C">C</option>
+                                    <option value="D">D</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Độ khó</label>
+                                <select name="Questions[${questionIndex}].Difficulty" class="form-select">
+                                    <option value="1">Dễ</option>
+                                    <option value="2">Trung bình</option>
+                                    <option value="3">Khó</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Điểm</label>
+                                <input type="number" name="Questions[${questionIndex}].Marks" class="form-control" value="1" step="0.5" min="0.5" />
+                            </div>
+                        </div>
+
+                        <div class="mb-2 mt-2">
+                            <label class="form-label">Giải thích</label>
+                            <textarea name="Questions[${questionIndex}].Explanation" class="form-control" rows="1"></textarea>
+                        </div>
+
+                        <input type="hidden" name="Questions[${questionIndex}].IsActive" value="true" />
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', questionHtml);
+            questionIndex++;
+            updateQuestionNumbers();
+        }
+
+        function removeQuestion(index) {
+            const question = document.getElementById(`question_${index}`);
+            question.remove();
+            updateQuestionNumbers();
+        }
+
+        function updateQuestionNumbers() {
+            const cards = document.querySelectorAll('.question-card');
+            cards.forEach((card, i) => {
+                card.querySelector('.card-header strong').textContent = `Câu hỏi ${i + 1}`;
+            });
+        }
+    </script>
+}

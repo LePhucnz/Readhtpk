@@ -25,7 +25,8 @@
                 <dd class="col-sm-9">@Model.ExamDate.ToString("dd/MM/yyyy HH:mm")</dd>
             </dl>
             
-            <form asp-action="Delete">
+            <form asp-action="Delete" method="post">
+                @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="Id" />
                 <button type="submit" class="btn btn-danger">Xóa vĩnh viễn</button>
                 <a asp-action="Index" class="btn btn-secondary">Hủy</a>
