@@ -1,49 +1,107 @@
 ﻿@model IEnumerable<Readhtpk.Models.Subject>
+@{
+    ViewData["Title"] = "Môn học";
+    
+    // Thêm null check để tránh lỗi
+    var active = Model?.Count(m => m.IsActive) ?? 0;
+    var inactive = Model?.Count(m => !m.IsActive) ?? 0;
+    var total = Model?.Count() ?? 0;
+}
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2><i class="bi bi-book"></i> Danh sách Môn học</h2>
-        <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Tạo mới</a>
+<div class="mt-4">
+    <div class="page-header">
+        <div>
+            <h2><i class="bi bi-book-half me-2" style="color:var(--brand);"></i>Danh sách Môn học</h2>
+            <p class="subtitle">Quản lý các môn học trong hệ thống</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Tạo mới
+        </a>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <table class="table table-hover table-bordered">
-                <thead class="table-light">
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-collection-fill"></i></div>
+            <div>
+                <div class="stat-value">@total</div>
+                <div class="stat-label">Tổng môn học</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+            <div>
+                <div class="stat-value" style="color:var(--success);">@active</div>
+                <div class="stat-label">Hoạt động</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon red"><i class="bi bi-pause-circle-fill"></i></div>
+            <div>
+                <div class="stat-value" style="color:var(--danger);">@inactive</div>
+                <div class="stat-label">Tạm ngừng</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="bi bi-book-half"></i></div>
+                <strong>Chưa có môn học nào</strong>
+                <p>Nhấn "Tạo mới" để thêm môn học đầu tiên.</p>
+            </div>
+        }
+        else
+        {
+            <table class="table table-hover rh-table">
+                <thead>
                     <tr>
-                        <th>@Html.DisplayNameFor(model => model.Name)</th>
-                        <th>@Html.DisplayNameFor(model => model.Code)</th>
-                        <th>@Html.DisplayNameFor(model => model.Description)</th>
-                        <th>@Html.DisplayNameFor(model => model.IsActive)</th>
-                        <th style="width: 150px;">Chức năng</th>
+                        <th>Tên môn học</th>
+                        <th style="width:110px;">Mã môn</th>
+                        <th>Mô tả</th>
+                        <th style="width:130px;">Trạng thái</th>
+                        <th style="width:160px;">Chức năng</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td>@Html.DisplayFor(modelItem => item.Name)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Code)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                            <td><div class="cell-name">@Html.DisplayFor(m => item.Name)</div></td>
+                            <td><span class="code-chip">@Html.DisplayFor(m => item.Code)</span></td>
+                            <td style="color:var(--text-secondary);">@Html.DisplayFor(m => item.Description)</td>
                             <td>
                                 @if (item.IsActive)
                                 {
-                                    <span class="badge bg-success">Hoạt động</span>
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-circle-fill" style="font-size:7px;"></i> Hoạt động
+                                    </span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-danger">Ngừng</span>
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-circle-fill" style="font-size:7px;"></i> Ngừng
+                                    </span>
                                 }
                             </td>
                             <td>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Sửa</a>
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Chi tiết</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Xóa</a>
+                                <div class="rh-action-group">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="rh-btn rh-btn-edit" title="Sửa">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="rh-btn rh-btn-view" title="Chi tiết">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="rh-btn rh-btn-delete" title="Xóa">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-        </div>
+        }
     </div>
 </div>

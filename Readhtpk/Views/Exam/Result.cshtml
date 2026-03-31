@@ -1,110 +1,138 @@
 ﻿@model Readhtpk.Models.ExamResult
 @{
     ViewData["Title"] = "Kết quả thi";
+    var correct = Model.UserAnswers.Count(a => a.Question.CorrectAnswer?.ToUpper() == a.SelectedAnswer?.ToUpper());
+    var wrong = Model.UserAnswers.Count() - correct;
+    var pct = Model.Exam.TotalMarks > 0 ? Math.Round((double)((decimal)Model.Score / (decimal)Model.Exam.TotalMarks * 100), 1) : 0.0;
 }
 
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">📊 Kết quả bài thi</h4>
-            <span class="badge bg-light text-dark fs-6">Lần làm thứ @Model.AttemptNumber</span>
-        </div>
-        <div class="card-body">
-            <!-- Thông tin chung -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <h5 class="card-title">@Model.Exam.Title</h5>
-                    <p class="mb-1"><strong>Môn:</strong> @Model.Exam.Subject?.Name</p>
-                    <p class="mb-1"><strong>Thời gian:</strong> @Model.StartTime.ToString("dd/MM/yyyy HH:mm")</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <div class="alert alert-success d-inline-block mb-0">
-                        <h3 class="mb-0">🎯 @Model.Score / @Model.Exam.TotalMarks điểm</h3>
+<div class="mt-4 mb-5">
+    <!-- Hero score card -->
+    <div class="card mb-4" style="overflow:hidden;">
+        <div class="score-hero">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
+                <div>
+                    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;opacity:0.7;margin-bottom:10px;">
+                        <i class="bi bi-arrow-repeat me-1"></i>Lần thứ @Model.AttemptNumber
+                        &nbsp;·&nbsp;
+                        <i class="bi bi-calendar3 me-1"></i>@Model.StartTime.ToString("dd/MM/yyyy HH:mm")
                     </div>
+                    <h3 style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;margin:0 0 8px;">@Model.Exam.Title</h3>
+                    <span style="font-size:14px;opacity:0.85;"><i class="bi bi-book me-1"></i>@Model.Exam.Subject?.Name</span>
+                </div>
+                <div style="text-align:center;background:rgba(255,255,255,0.15);border-radius:var(--radius-lg);padding:16px 28px;">
+                    <div class="score-lbl">Điểm số</div>
+                    <div class="score-num">@Model.Score</div>
+                    <div class="score-total">/ @Model.Exam.TotalMarks điểm</div>
                 </div>
             </div>
-
-            <!-- Chi tiết câu trả lời -->
-            <h5 class="mb-3">📝 Chi tiết câu trả lời:</h5>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 5%">#</th>
-                            <th style="width: 40%">Câu hỏi</th>
-                            <th style="width: 15%">Đáp án của bạn</th>
-                            <th style="width: 15%">Đáp án đúng</th>
-                            <th style="width: 25%">Giải thích</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @{
-                            int qIndex = 0;
-                        }
-                        @foreach (var ua in Model.UserAnswers)
-                        {
-                            qIndex++;
-                            var isCorrect = ua.Question.CorrectAnswer?.ToUpper() == ua.SelectedAnswer?.ToUpper();
-                            
-                            // Lấy nội dung đáp án đúng để hiển thị
-                            string correctContent = ua.Question.CorrectAnswer switch
-                            {
-                                "A" => ua.Question.AnswerA,
-                                "B" => ua.Question.AnswerB,
-                                "C" => ua.Question.AnswerC,
-                                "D" => ua.Question.AnswerD,
-                                _ => "N/A"
-                            };
-
-                            <tr class="@(isCorrect ? "table-success" : "table-danger")">
-                                <td class="text-center fw-bold">@qIndex</td>
-                                <td>@ua.Question.Content</td>
-                                <td class="text-center">
-                                    <span class="badge @(isCorrect ? "bg-success" : "bg-danger")">
-                                        @ua.SelectedAnswer
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge bg-info text-dark">
-                                        @ua.Question.CorrectAnswer (@correctContent)
-                                    </span>
-                                </td>
-                                <td class="small text-muted">
-                                    @if (!string.IsNullOrEmpty(ua.Question.Explanation))
-                                    {
-                                        <i class="bi bi-info-circle"></i> 
-                                        @ua.Question.Explanation
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Nút điều hướng -->
-            <div class="mt-4 d-flex gap-2 flex-wrap">
-                <a asp-action="History" asp-route-examId="@Model.ExamId" class="btn btn-secondary">
-                    ← Lịch sử đề này
-                </a>
-                <a asp-action="History" class="btn btn-outline-secondary">
-                    📚 Tất cả lịch sử
-                </a>
-                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">
-                    🏠 Về trang chủ
-                </a>
-                
-                @if (Model.Status == "Submitted" || Model.Status == "Timeout")
-                {
-                    <a asp-action="Retake" asp-route-id="@Model.ExamId" class="btn btn-warning text-dark">
-                        🔄 Làm lại bài (Xáo trộn câu hỏi)
-                    </a>
-                }
+            <!-- Progress bar -->
+            <div style="margin-top:1.5rem;">
+                <div style="height:8px;background:rgba(255,255,255,0.2);border-radius:999px;overflow:hidden;">
+                    <div style="height:100%;width:@((int)pct)%;background:rgba(255,255,255,0.85);border-radius:999px;"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;opacity:0.7;margin-top:4px;">
+                    <span>0</span><span>@((int)pct)% đạt</span><span>@Model.Exam.TotalMarks</span>
+                </div>
             </div>
         </div>
+        <!-- Stats strip -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);">
+            <div style="padding:1rem;text-align:center;border-right:1px solid var(--border);">
+                <div style="font-size:24px;font-weight:700;color:var(--success);">@correct</div>
+                <div style="font-size:12px;color:var(--text-muted);font-weight:500;margin-top:2px;">Câu đúng</div>
+            </div>
+            <div style="padding:1rem;text-align:center;border-right:1px solid var(--border);">
+                <div style="font-size:24px;font-weight:700;color:var(--danger);">@wrong</div>
+                <div style="font-size:12px;color:var(--text-muted);font-weight:500;margin-top:2px;">Câu sai</div>
+            </div>
+            <div style="padding:1rem;text-align:center;">
+                <div style="font-size:24px;font-weight:700;color:var(--brand);">@Model.UserAnswers.Count()</div>
+                <div style="font-size:12px;color:var(--text-muted);font-weight:500;margin-top:2px;">Tổng câu</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
+        <h5 style="font-weight:700;margin:0;font-size:16px;">
+            <i class="bi bi-list-check me-2" style="color:var(--brand);"></i>Chi tiết câu trả lời
+        </h5>
+        <div style="display:flex;gap:8px;">
+            <span class="badge bg-success" style="padding:6px 12px;"><i class="bi bi-check2 me-1"></i>Đúng: @correct</span>
+            <span class="badge bg-danger" style="padding:6px 12px;"><i class="bi bi-x me-1"></i>Sai: @wrong</span>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th style="width:44px;">#</th>
+                    <th>Câu hỏi</th>
+                    <th style="width:130px;">Đáp án của bạn</th>
+                    <th style="width:170px;">Đáp án đúng</th>
+                    <th style="width:200px;">Giải thích</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int qi = 0;
+                }
+                @foreach (var ua in Model.UserAnswers)
+                {
+                    qi++;
+                    var ok = ua.Question.CorrectAnswer?.ToUpper() == ua.SelectedAnswer?.ToUpper();
+                    string cc = ua.Question.CorrectAnswer switch
+                    {
+                        "A" => ua.Question.AnswerA,
+                        "B" => ua.Question.AnswerB,
+                        "C" => ua.Question.AnswerC,
+                        "D" => ua.Question.AnswerD,
+                        _ => "N/A"
+                    };
+                    <tr class="@(ok ? "row-correct" : "row-wrong")">
+                        <td class="text-center">
+                            <span style="width:26px;height:26px;border-radius:50%;background:@(ok ? "var(--success-bg)" : "var(--danger-bg)");color:@(ok ? "var(--success)" : "var(--danger)");display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">@qi</span>
+                        </td>
+                        <td style="font-size:14px;line-height:1.5;">@ua.Question.Content</td>
+                        <td class="text-center">
+                            @if (ok)
+                            {
+                                <span class="badge bg-success"><i class="bi bi-check2 me-1"></i>@ua.SelectedAnswer</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger"><i class="bi bi-x me-1"></i>@(string.IsNullOrEmpty(ua.SelectedAnswer) ? "Bỏ qua" : ua.SelectedAnswer)</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-info"><i class="bi bi-check-circle-fill me-1"></i>@ua.Question.CorrectAnswer — @cc</span>
+                        </td>
+                        <td style="font-size:13px;color:var(--text-muted);">
+                            @if (!string.IsNullOrEmpty(ua.Question.Explanation))
+                            {
+                                <i class="bi bi-info-circle-fill me-1" style="color:var(--brand);"></i>
+                                @ua.Question.Explanation
+                            }
+                            else
+                            {
+                                <span>—</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 d-flex gap-2 flex-wrap">
+        <a asp-action="History" asp-route-examId="@Model.ExamId" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Lịch sử đề này</a>
+        <a asp-action="History" class="btn btn-outline-secondary"><i class="bi bi-clock-history"></i> Tất cả lịch sử</a>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary"><i class="bi bi-house"></i> Trang chủ</a>
+        @if (Model.Status == "Submitted" || Model.Status == "Timeout")
+        {
+            <a asp-action="Retake" asp-route-id="@Model.ExamId" class="btn btn-primary"><i class="bi bi-arrow-repeat"></i> Làm lại bài</a>
+        }
     </div>
 </div>

@@ -2,28 +2,47 @@
 @{
     ViewData["Title"] = ViewBag.ExamTitle ?? "Làm bài thi";
     int index = 0;
+    var totalQ = Model.Count();
 }
 
 @if (ViewBag.IsRetake == true)
 {
-    <div class="alert alert-info alert-dismissible fade show" role="alert">
-        <strong>🔄 Làm lại bài thi!</strong> Câu hỏi và đáp án đã được xáo trộn ngẫu nhiên.
+    <div class="alert alert-info alert-dismissible fade show mt-3">
+        <i class="bi bi-arrow-repeat me-2"></i>
+        <strong>Làm lại bài thi!</strong> Câu hỏi và đáp án đã được xáo trộn ngẫu nhiên.
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
-<!-- Rest of the view... -->
-
-<div class="container mt-4">
+<div class="mt-4">
     <div class="exam-header card mb-4">
         <div class="card-body">
-            <h4 class="card-title">@ViewBag.ExamTitle</h4>
-            <p class="card-text">
-                ⏱ Thời gian: <strong>@ViewBag.DurationMinutes phút</strong> |
-                📊 Tổng điểm: <strong>@ViewBag.TotalMarks</strong>
-            </p>
-            <div id="timer" class="alert alert-warning mb-0">
-                Thời gian còn lại: <span id="timeDisplay">@ViewBag.DurationMinutes:00</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                <div>
+                    <div style="display:flex;gap:8px;margin-bottom:8px;">
+                        <span class="badge bg-primary"><i class="bi bi-journal-text me-1"></i>@totalQ câu</span>
+                        <span class="badge" style="background:var(--brand-light);color:var(--brand);">
+                            <i class="bi bi-star-fill me-1"></i>@ViewBag.TotalMarks điểm
+                        </span>
+                    </div>
+                    <h4 style="font-family:'Sora',sans-serif;font-weight:700;font-size:18px;color:var(--text-primary);margin:0;">
+                        @ViewBag.ExamTitle
+                    </h4>
+                </div>
+                <div id="timer" class="alert alert-warning mb-0 py-2 px-4"
+                     style="font-weight:700;font-size:16px;border-radius:var(--radius-pill);min-width:190px;text-align:center;">
+                    <i class="bi bi-stopwatch-fill me-2"></i>
+                    <span id="timeDisplay">@ViewBag.DurationMinutes:00</span>
+                </div>
+            </div>
+            <div style="margin-top:14px;">
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:5px;">
+                    <span>Tiến độ</span>
+                    <span id="progress-text">0 / @totalQ câu đã trả lời</span>
+                </div>
+                <div style="height:6px;background:var(--border);border-radius:999px;overflow:hidden;">
+                    <div id="progress-bar" style="height:100%;width:0%;background:var(--brand);border-radius:999px;transition:width 0.3s;"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -31,75 +50,75 @@
     <form asp-action="Submit" method="post" id="examForm">
         @foreach (var q in Model)
         {
+            index++;
             <div class="question-card card mb-3">
                 <div class="card-body">
-                    <p class="fw-bold">Câu @(++index): @q.Content</p>
-                    
-                    <!-- Hidden field để lưu QuestionId -->
+                    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;">
+                        <span class="q-number">@index</span>
+                        <p style="font-weight:600;font-size:15px;color:var(--text-primary);margin:0;line-height:1.5;">@q.Content</p>
+                    </div>
                     <input type="hidden" name="answers[@(index - 1)].QuestionId" value="@q.Id" />
-                    
-                    <div class="answers-list">
-                        <label class="answer-option d-block mb-2">
+                    <div class="answers-list" data-q="@index">
+                        <label class="answer-option">
                             <input type="radio" name="answers[@(index - 1)].SelectedAnswer" value="A" required />
-                            <strong>A.</strong> @q.AnswerA
+                            <span class="answer-letter">A.</span><span>@q.AnswerA</span>
                         </label>
-                        <label class="answer-option d-block mb-2">
+                        <label class="answer-option">
                             <input type="radio" name="answers[@(index - 1)].SelectedAnswer" value="B" />
-                            <strong>B.</strong> @q.AnswerB
+                            <span class="answer-letter">B.</span><span>@q.AnswerB</span>
                         </label>
-                        <label class="answer-option d-block mb-2">
+                        <label class="answer-option">
                             <input type="radio" name="answers[@(index - 1)].SelectedAnswer" value="C" />
-                            <strong>C.</strong> @q.AnswerC
+                            <span class="answer-letter">C.</span><span>@q.AnswerC</span>
                         </label>
-                        <label class="answer-option d-block mb-2">
+                        <label class="answer-option">
                             <input type="radio" name="answers[@(index - 1)].SelectedAnswer" value="D" />
-                            <strong>D.</strong> @q.AnswerD
+                            <span class="answer-letter">D.</span><span>@q.AnswerD</span>
                         </label>
                     </div>
                 </div>
             </div>
         }
-        
-        <div class="exam-actions mt-4 mb-5">
-            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
-                📤 Nộp bài
+        <div style="display:flex;gap:12px;margin-top:1.5rem;margin-bottom:3rem;">
+            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" style="justify-content:center;min-width:180px;">
+                <i class="bi bi-send-fill"></i> Nộp bài
             </button>
-            <a asp-action="History" class="btn btn-secondary btn-lg">❌ Hủy</a>
+            <a asp-action="History" class="btn btn-outline-secondary btn-lg">
+                <i class="bi bi-x-lg"></i> Hủy
+            </a>
         </div>
     </form>
 </div>
 
 @section Scripts {
     <script>
-        // ⏱ Đồng hồ đếm ngược (Bạn 4 có thể mở rộng thêm)
         let totalSeconds = @ViewBag.DurationMinutes * 60;
         const timeDisplay = document.getElementById('timeDisplay');
-        const examForm = document.getElementById('examForm');
-        
+        const timerEl     = document.getElementById('timer');
+        const examForm    = document.getElementById('examForm');
+        const totalQ      = @totalQ;
+
         const timer = setInterval(() => {
             let mins = Math.floor(totalSeconds / 60);
             let secs = totalSeconds % 60;
             timeDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-            
-            // Cảnh báo khi còn 5 phút
             if (totalSeconds <= 300) {
-                document.getElementById('timer').classList.add('alert-danger');
+                timerEl.classList.add('alert-danger');
+                timerEl.classList.remove('alert-warning');
             }
-            
             if (totalSeconds <= 0) {
                 clearInterval(timer);
-                alert('⏰ Hết giờ! Bài thi sẽ được tự động nộp.');
+                alert('Hết giờ! Bài thi sẽ tự động nộp.');
                 examForm.submit();
             }
             totalSeconds--;
         }, 1000);
 
-        // 🚫 Chống chuyển tab (Bạn 4 có thể bổ sung thêm)
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                console.warn('⚠️ User switched tab');
-                // Có thể thêm logic cảnh báo hoặc ghi log
-            }
-        });
+        function updateProgress() {
+            const answered = document.querySelectorAll('.answers-list input[type=radio]:checked').length;
+            document.getElementById('progress-bar').style.width = (answered / totalQ * 100) + '%';
+            document.getElementById('progress-text').textContent = answered + ' / ' + totalQ + ' câu đã trả lời';
+        }
+        document.querySelectorAll('.answers-list input[type=radio]').forEach(r => r.addEventListener('change', updateProgress));
     </script>
 }

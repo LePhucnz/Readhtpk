@@ -1,119 +1,97 @@
 ﻿@model IEnumerable<Readhtpk.Models.Exam>
-@using System.Security.Claims
-
 @{
-    // Kiểm tra role của user
-    var isStudent = User.IsInRole("Student") && !User.IsInRole("Admin") && !User.IsInRole("Teacher");
-    var isAdminOrTeacher = User.IsInRole("Admin") || User.IsInRole("Teacher");
+    ViewData["Title"] = "Đề thi";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2><i class="bi bi-file-earmark-text"></i> Danh sách Đề thi</h2>
-        
-        @* ✅ CHỈ Admin/Teacher thấy nút Tạo mới *@
-        @if (isAdminOrTeacher)
-        {
-            <a asp-action="Create" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Tạo mới
-            </a>
-        }
+<div class="mt-4">
+    <div class="page-header">
+        <div>
+            <h2><i class="bi bi-file-earmark-text-fill me-2" style="color:var(--brand);"></i>Danh sách Đề thi</h2>
+            <p class="subtitle">Quản lý các đề thi trong hệ thống</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Tạo mới
+        </a>
     </div>
 
-    @if (isStudent)
+    @if (!Model.Any())
     {
-        <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i>
-            <strong>Chào mừng bạn đến với phòng thi!</strong><br />
-            Chọn đề thi bên dưới và bấm "Làm bài" để bắt đầu.
+        <div class="table-wrapper">
+            <div class="empty-state" style="padding:5rem 2rem;">
+                <div class="empty-state-icon"><i class="bi bi-file-earmark-text"></i></div>
+                <strong>Chưa có đề thi nào</strong>
+                <p>Nhấn "Tạo mới" để tạo đề thi đầu tiên.</p>
+                <a asp-action="Create" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-lg"></i> Tạo đề thi ngay
+                </a>
+            </div>
         </div>
     }
-
-    <div class="card shadow-sm">
-        <div class="card-body">
-            @if (!Model.Any())
-            {
-                <div class="alert alert-warning text-center">
-                    @if (isStudent)
-                    {
-                        <i class="bi bi-exclamation-triangle"></i>
-                        <strong>Không có đề thi nào khả dụng.</strong>
-
-                        <br />
-                        <small>Vui lòng quay lại sau hoặc liên hệ giáo viên để được hỗ trợ.</small>
-                    }
-                    else
-                    {
-                        <i class="bi bi-info-circle">Chưa có đề thi nào.Bấm "Tạo mới" để thêm đề thi đầu tiên.</i>
-                    }
-                </div>
-            }
-            else
-            {
-                <table class="table table-hover table-bordered">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Tên đề</th>
-                            <th>Môn học</th>
-                            <th>Thời lượng (phút)</th>
-                            <th>Số câu</th>
-                            <th>Ngày thi</th>
-                            <th style="width: @(isStudent ? "120px" : "220px")">Chức năng</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                                <td>@Html.DisplayFor(modelItem => item.Subject.Name)</td>
-                                <td>@Html.DisplayFor(modelItem => item.DurationMinutes)</td>
-                                <td>@Html.DisplayFor(modelItem => item.TotalQuestions)</td>
-                                <td>@Html.DisplayFor(modelItem => item.TotalMarks)</td>
-                                <td>@item.ExamDate.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td>
-                                    @* ✅ Student: Chỉ thấy nút Làm bài *@
-                                    @if (isStudent)
-                                    {
-                                        <a asp-controller="Exam"
-                                               asp-action="TakeExam"
-                                               asp-route-id="@item.Id"
-                                               class="btn btn-sm btn-success w-100">
-                                            <i class="bi bi-play-fill"></i> Làm bài
-                                        </a>
-                                    }
-                                    
-                                    @* ✅ Admin/Teacher: Thấy đầy đủ chức năng *@
-                                    @if (isAdminOrTeacher)
-                                    {
-                                        <div class="btn-group-vertical w-100">
-                                            <a asp-controller="ExamQuestions" asp-action="ByExam" asp-route-examId="@item.Id"
-                                                   class="btn btn-sm btn-info mb-1">
-                                                <i class="bi bi-list-check"></i> Câu hỏi
-                                            </a>
-                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning mb-1">Sửa</a>
-                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger mb-1">Xóa</a>
-                                            <a asp-controller="Exam"
-                                                   asp-action="History"
-                                                   asp-route-examId="@item.Id"
-                                                   class="btn btn-sm btn-secondary mb-1">
-                                                <i class="bi bi-clock-history"></i> Lịch sử
-                                            </a>
-                                            <a asp-controller="Exam"
-                                                   asp-action="TakeExam"
-                                                   asp-route-id="@item.Id"
-                                                   class="btn btn-sm btn-success">
-                                                <i class="bi bi-play-fill"></i> Làm bài
-                                            </a>
-                                        </div>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
+    else
+    {
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="bi bi-file-earmark-text-fill"></i></div>
+                <div><div class="stat-value">@Model.Count()</div><div class="stat-label">Tổng đề thi</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+                <div><div class="stat-value" style="color:var(--success);">@Model.Count(e => e.IsActive)</div><div class="stat-label">Đang mở</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red"><i class="bi bi-x-circle-fill"></i></div>
+                <div><div class="stat-value" style="color:var(--danger);">@Model.Count(e => !e.IsActive)</div><div class="stat-label">Đã đóng</div></div>
+            </div>
         </div>
-    </div>
+
+        <div class="table-wrapper">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Tên đề thi</th>
+                        <th style="width:130px;">Môn học</th>
+                        <th style="width:100px;">Thời gian</th>
+                        <th style="width:90px;">Tổng điểm</th>
+                        <th style="width:120px;">Trạng thái</th>
+                        <th style="width:180px;">Chức năng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><div class="cell-name">@item.Title</div></td>
+                            <td style="color:var(--text-secondary);font-size:13px;">@item.Subject?.Name</td>
+                            <td>
+                                <span style="font-size:13px;font-weight:500;">
+                                    <i class="bi bi-clock me-1" style="color:var(--brand);"></i>@item.DurationMinutes phút
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">@item.TotalMarks đ</span>
+                            </td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge bg-success"><i class="bi bi-circle-fill" style="font-size:7px;"></i> Đang mở</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-danger"><i class="bi bi-circle-fill" style="font-size:7px;"></i> Đã đóng</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning"><i class="bi bi-pencil-fill"></i> Sửa</a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info"><i class="bi bi-eye-fill"></i> Chi tiết</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Xóa</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>
