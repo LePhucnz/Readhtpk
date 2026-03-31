@@ -1,71 +1,126 @@
 ﻿@model IEnumerable<Readhtpk.Controllers.UserListViewModel>
-
 @{
     ViewData["Title"] = "Quản lý Tài khoản";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2><i class="bi bi-people"></i> Quản lý Tài khoản</h2>
+<div class="mt-4">
+    <div class="page-header">
+        <div>
+            <h2><i class="bi bi-people-fill me-2" style="color:var(--brand);"></i>Quản lý Tài khoản</h2>
+            <p class="subtitle">Quản lý người dùng trong hệ thống</p>
+        </div>
         <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i> Tạo tài khoản mới
+            <i class="bi bi-person-plus-fill"></i> Tạo tài khoản mới
         </a>
     </div>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show">
-            @TempData["Success"]
+        <div class="alert alert-success alert-dismissible fade show mb-3">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["Success"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show">
-            @TempData["Error"]
+        <div class="alert alert-danger alert-dismissible fade show mb-3">
+            <i class="bi bi-x-circle-fill me-1"></i> @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>Email</th>
-                        <th>Họ tên</th>
-                        <th>Role</th>
-                        <th>Ngày tạo</th>
-                        <th style="width: 150px;">Chức năng</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var user in Model)
-                    {
-                        <tr>
-                            <td>@user.Email</td>
-                            <td>@user.FullName</td>
-                            <td>
-                                @foreach (var role in user.Roles)
-                                {
-                                    <span class="badge @(role == "Teacher" ? "bg-warning text-dark" : "bg-info")">
-                                        @role
-                                    </span>
-                                }
-                            </td>
-                            <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>
-                            <td>
-                                <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-warning">Sửa</a>
-                                <form asp-action="Delete" asp-route-id="@user.Id" method="post" class="d-inline"
-                                      onsubmit="return confirm('Bạn có chắc muốn xóa tài khoản @user.Email?');">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-people-fill"></i></div>
+            <div><div class="stat-value">@Model.Count()</div><div class="stat-label">Tổng tài khoản</div></div>
         </div>
+        <div class="stat-card">
+            <div class="stat-icon red"><i class="bi bi-shield-fill"></i></div>
+            <div><div class="stat-value" style="color:var(--danger);">@Model.Count(u => u.Roles.Contains("Admin"))</div><div class="stat-label">Admin</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon amber"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="stat-value" style="color:var(--warning);">@Model.Count(u => u.Roles.Contains("Teacher"))</div><div class="stat-label">Giáo viên</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-person-fill"></i></div>
+            <div><div class="stat-value" style="color:var(--success);">@Model.Count(u => u.Roles.Contains("Student"))</div><div class="stat-label">Học sinh</div></div>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Tài khoản</th>
+                    <th>Họ tên</th>
+                    <th style="width:160px;">Vai trò</th>
+                    <th style="width:120px;">Ngày tạo</th>
+                    <th style="width:140px;">Chức năng</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div style="width:34px;height:34px;border-radius:50%;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--brand);flex-shrink:0;">
+                                    @(user.FullName?.Length > 0 ? user.FullName[0].ToString().ToUpper() : "?")
+                                </div>
+                                <span style="font-size:14px;color:var(--text-secondary);">@user.Email</span>
+                            </div>
+                        </td>
+                        <td style="font-weight:600;">@user.FullName</td>
+                        <td>
+                            @foreach (var role in user.Roles)
+                            {
+                                @if (role == "Admin")
+                                {
+                                    <span class="badge bg-danger me-1">@role</span>
+                                }
+                                else if (role == "Teacher")
+                                {
+
+                                    <span class="badge bg-warning me-1">@role</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-primary me-1">@role</span>
+                                }
+                            }
+                        </td>
+                        <td style="color:var(--text-muted);font-size:13px;">@user.CreatedAt.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <div class="action-group">
+                                <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil-fill"></i> Sửa
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@user.Id" method="post" class="d-inline"
+                                      onsubmit="return confirm('Xóa tài khoản @user.Email?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash-fill"></i> Xóa
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-state-icon"><i class="bi bi-people"></i></div>
+                                <strong>Chưa có tài khoản nào</strong>
+                                <p>Nhấn "Tạo tài khoản mới" để bắt đầu.</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>

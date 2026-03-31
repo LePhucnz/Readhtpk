@@ -1,139 +1,126 @@
 ﻿@model IEnumerable<Readhtpk.Models.ExamResult>
 @{
-    ViewData["Title"] = ViewBag.ExamTitle != null ?
-        $"Lịch sử: {ViewBag.ExamTitle}" : "Lịch sử thi";
+    ViewData["Title"] = ViewBag.ExamTitle != null ? $"Lịch sử: {ViewBag.ExamTitle}" : "Lịch sử thi";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="mt-4">
+    <div class="page-header">
         <div>
             @if (ViewBag.ExamTitle != null)
             {
-                <h3>📚 Lịch sử thi: <span class="text-primary">@ViewBag.ExamTitle</span></h3>
-                <a asp-action="History" class="btn btn-sm btn-outline-secondary mt-2">
-                    ← Xem tất cả đề thi
-                </a>
+                <h2><i class="bi bi-clock-history me-2" style="color:var(--brand);"></i>Lịch sử: <span style="color:var(--brand);">@ViewBag.ExamTitle</span></h2>
+                <a asp-action="History" class="btn btn-sm btn-outline-secondary mt-1"><i class="bi bi-arrow-left"></i> Xem tất cả</a>
             }
             else
             {
-                <h3>📚 Lịch sử bài thi</h3>
+                <h2><i class="bi bi-clock-history me-2" style="color:var(--brand);"></i>Lịch sử bài thi</h2>
+                <p class="subtitle">Tổng hợp các bài thi đã thực hiện</p>
             }
         </div>
         <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
-            🏠 Về trang chủ
+            <i class="bi bi-house"></i> Trang chủ
         </a>
     </div>
-    
+
     @if (!Model.Any())
     {
-        <div class="alert alert-info text-center">
-            <i class="bi bi-info-circle"></i>
-            @if (ViewBag.ExamTitle != null)
-            {
-                <span>Bạn chưa làm đề thi "<strong>@ViewBag.ExamTitle</strong>" lần nào.</span>
-            }
-            else
-            {
-                <span>Bạn chưa tham gia kỳ thi nào.</span>
-            }
+        <div class="table-wrapper">
+            <div class="empty-state" style="padding:5rem 2rem;">
+                <div class="empty-state-icon"><i class="bi bi-clock-history"></i></div>
+                <strong>Chưa có lịch sử thi</strong>
+                <p>@(ViewBag.ExamTitle != null ? "Bạn chưa làm đề thi này lần nào." : "Bạn chưa tham gia kỳ thi nào.")</p>
+                <a asp-controller="AdminExams" asp-action="Index" class="btn btn-primary mt-3">
+                    <i class="bi bi-journal-check"></i> Xem đề thi
+                </a>
+            </div>
         </div>
     }
     else
     {
-        <!-- Thống kê (chỉ hiện khi lọc theo đề) -->
         @if (ViewBag.FilteredExamId != null)
         {
             var maxScore = Model.Max(r => r.Score);
             var avgScore = Model.Average(r => r.Score);
-            var attemptCount = Model.Count();
-            
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h6 class="text-muted">Số lần làm</h6>
-                            <h3 class="text-primary">@attemptCount</h3>
-                        </div>
-                    </div>
+            var count = Model.Count();
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="bi bi-arrow-repeat"></i></div>
+                    <div><div class="stat-value">@count</div><div class="stat-label">Số lần làm</div></div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h6 class="text-muted">Điểm cao nhất</h6>
-                            <h3 class="text-success">@maxScore</h3>
-                        </div>
-                    </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="bi bi-trophy-fill"></i></div>
+                    <div><div class="stat-value" style="color:var(--success);">@maxScore</div><div class="stat-label">Điểm cao nhất</div></div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h6 class="text-muted">Điểm trung bình</h6>
-                            <h3 class="text-info">@avgScore.ToString("F1")</h3>
-                        </div>
-                    </div>
+                <div class="stat-card">
+                    <div class="stat-icon sky"><i class="bi bi-bar-chart-fill"></i></div>
+                    <div><div class="stat-value" style="color:var(--info);">@avgScore.ToString("F1")</div><div class="stat-label">Điểm trung bình</div></div>
                 </div>
             </div>
         }
-        
-        <!-- Table giữ nguyên -->
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
+
+        <div class="table-wrapper">
+            <table class="table table-hover">
+                <thead>
                     <tr>
                         <th>Đề thi</th>
-                        <th>Môn học</th>
-                        <th>Thời gian</th>
-                        <th>Điểm</th>
-                        <th>Trạng thái</th>
-                        <th class="text-end">Thao tác</th>
+                        <th style="width:130px;">Môn học</th>
+                        <th style="width:150px;">Thời gian</th>
+                        <th style="width:90px;">Điểm</th>
+                        <th style="width:120px;">Trạng thái</th>
+                        <th style="width:190px;" class="text-end">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var result in Model)
                     {
                         <tr>
-                            <td class="fw-bold">@result.Exam.Title</td>
-                            <td>@result.Exam.Subject?.Name</td>
-                            <td>@result.StartTime.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td><div class="cell-name">@result.Exam.Title</div></td>
+                            <td style="color:var(--text-secondary);font-size:13px;">@result.Exam.Subject?.Name</td>
+                            <td style="color:var(--text-muted);font-size:13px;">
+                                <i class="bi bi-calendar3 me-1"></i>@result.StartTime.ToString("dd/MM/yyyy HH:mm")
+                            </td>
                             <td>
-                                <span class="badge bg-primary fs-6">@result.Score</span>
+                                <span class="badge bg-primary" style="font-size:13px;padding:5px 12px;">@result.Score</span>
                             </td>
                             <td>
                                 @if (result.Status == "Submitted")
                                 {
-                                    <span class="badge bg-success">✅ Đã nộp</span>
+                                    <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i>Đã nộp</span>
                                 }
                                 else if (result.Status == "Timeout")
                                 {
-                                    <span class="badge bg-warning text-dark">⏰ Hết giờ</span>
+
+                                    <span class="badge bg-warning"><i class="bi bi-alarm me-1"></i>Hết giờ</span>
                                 }
                                 else if (result.Status == "InProgress")
                                 {
-                                    <span class="badge bg-warning">🔄 Đang làm</span>
+
+                                    <span class="badge bg-info"><i class="bi bi-arrow-repeat me-1"></i>Đang làm</span>
                                 }
                                 else
                                 {
+
                                     <span class="badge bg-secondary">@result.Status</span>
                                 }
                             </td>
                             <td class="text-end">
-                                @if (result.Status == "InProgress")
-                                {
-                                    <a asp-action="Start" asp-route-id="@result.ExamId" class="btn btn-sm btn-warning text-dark">
-                                        ▶️ Tiếp tục
-                                    </a>
-                                }
-                                
-                                @if (result.Status == "Submitted" || result.Status == "Timeout")
-                                {
-                                    <a asp-action="Result" asp-route-id="@result.Id" class="btn btn-sm btn-info text-white">
-                                        🔍 Chi tiết
-                                    </a>
-                                    
-                                    <a asp-action="Retake" asp-route-id="@result.ExamId" class="btn btn-sm btn-warning text-dark">
-                                        🔄 Làm lại
-                                    </a>
-                                }
+                                <div class="action-group justify-content-end">
+                                    @if (result.Status == "InProgress")
+                                    {
+                                        <a asp-action="Start" asp-route-id="@result.ExamId" class="btn btn-sm btn-warning">
+                                            <i class="bi bi-play-fill"></i> Tiếp tục
+                                        </a>
+                                    }
+                                    @if (result.Status == "Submitted" || result.Status == "Timeout")
+                                    {
+                                        <a asp-action="Result" asp-route-id="@result.Id" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye-fill"></i> Chi tiết
+                                        </a>
+                                        <a asp-action="Retake" asp-route-id="@result.ExamId" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-arrow-repeat"></i> Làm lại
+                                        </a>
+                                    }
+                                </div>
                             </td>
                         </tr>
                     }
